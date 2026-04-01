@@ -1,471 +1,168 @@
-/*
-This file was using SCSS syntax. All SCSS variables and @use have been removed for valid CSS.
-If you want to use variables and loops, use a .scss file and compile it to CSS.
-*/
+@font-face {
+  font-family: 'PixelArabic';
+  src: url('fonts/ar-pixel.ttf') format('truetype');
+}
 
-:root {
-	color-scheme: dark;
-	--cube-size: 5rem;
-	--camera-distance: 50rem;
+@keyframes bg-scrolling {
+  0% { background-position: 0 0; }
+  100% { background-position: 250px 250px; }
+}
 
-	--air-image: none;
-	--pickaxe-image: url("https://benjaminaster.com/css-minecraft/assets/pickaxe.png");
-	--stone-image: url("https://benjaminaster.com/css-minecraft/assets/stone.png");
-	--grass-image: url("https://benjaminaster.com/css-minecraft/assets/grass_side_carried.png");
-	--grass-top-image: url("https://benjaminaster.com/css-minecraft/assets/grass_carried.png");
-	--dirt-image: url("https://benjaminaster.com/css-minecraft/assets/dirt.png");
-	--log-image: url("https://benjaminaster.com/css-minecraft/assets/log_oak.png");
-	--log-top-image: url("https://benjaminaster.com/css-minecraft/assets/log_oak_top.png");
-	--leaves-image: url("https://benjaminaster.com/css-minecraft/assets/azalea_leaves.png");
-	--glass-image: url("https://benjaminaster.com/css-minecraft/assets/glass.png");
+@keyframes titleFloatAndRotate {
+  0%, 100% { transform: translateY(0) rotate(-3deg); }
+  50% { transform: translateY(-15px) rotate(3deg); }
+}
+
+@keyframes titleFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+@keyframes scroll-infinite {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(50%); }
 }
 
 body {
-	color: white;
-	background-color: lightSkyBlue;
-	block-size: 100vh;
-	block-size: 100dvb;
-	margin: 0;
-	box-sizing: border-box;
-	font-family: system-ui, sans-serif;
-	overflow: hidden;
-
-	perspective: var(--camera-distance);
-	perspective-origin: center center;
-
-	display: grid;
-	place-content: center center;
+  margin: 0; padding: 0;
+  background: linear-gradient(rgba(30, 30, 30, 0.7), rgba(30, 30, 30, 0.7)), 
+              url('https://img.itch.zone/aW1nLzI0NzQ2NzM3LnBuZw==/original/dzRs3r.png');
+  background-repeat: repeat; background-size: 250px; background-attachment: fixed;
+  animation: bg-scrolling 10s linear infinite;
+  font-family: 'PixelArabic', sans-serif;
+  direction: rtl; overflow-x: hidden;
 }
 
-body, body * {
-	transform-style: preserve-3d;
+.center { display: flex; flex-direction: column; align-items: center; padding: 50px 0; }
+
+/* الصورة الشخصية مكبرة */
+.lemon-img { width: 220px; height: 220px; overflow: hidden; margin-bottom: 20px; }
+.lemon-img img { width: 100%; height: 100%; object-fit: cover; image-rendering: pixelated; }
+
+h1 {
+  font-size: 3.2em; color: white; margin: 10px 0;
+  text-shadow: 4px 4px 0px #000;
+  animation: titleFloatAndRotate 3s ease-in-out infinite;
+  display: inline-block;
 }
 
-label, button {
-	cursor: pointer;
+.desc { color: white; text-align: center; margin-bottom: 30px; line-height: 1.6; }
+.welcome-text { font-size: 1.5em; display: inline-block; margin-bottom: 2px; }
+.job-text { font-size: 1.2em; opacity: 0.85; }
+
+.social-links { display: flex; gap: 15px; margin-bottom: 30px; }
+.social-btn {
+  cursor: pointer; height: 55px; width: 55px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 14px; overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border: 2px solid #fff;
+  animation: titleFloat 4s ease-in-out infinite;
+  text-decoration: none; padding: 0 12px; box-sizing: border-box;
 }
 
-h1, p {
-	margin: 0;
+#discord { background-color: #6367E9; }
+#github  { background-color: #16181B; }
+#itch    { background-color: #DD6660; }
+#email   { background-color: #808080; }
+
+.social-btn svg, .social-btn img { height: 28px; width: 28px; flex-shrink: 0; }
+.social-btn span { width: 0; opacity: 0; overflow: hidden; transition: 0.4s; font-weight: bold; color: white; white-space: nowrap; }
+.social-btn:hover { width: 165px; transform: scale(1.05); gap: 15px; justify-content: flex-start; }
+.social-btn:hover span { width: auto; opacity: 1; }
+
+.image-separator {
+  width: 100vw; height: 300px;
+  background-image: url('https://img.itch.zone/aW1nLzI0Njk1NjU0LnBuZw==/original/fEBnOw.png');
+  background-size: auto 100%; background-repeat: repeat-x;
+  background-position: center; image-rendering: pixelated; margin: 40px 0;
 }
 
-h1, strong {
-	font-weight: 600;
+.section-title {
+  width: 90%; max-width: 800px; color: white; text-align: right;
+  border-right: 8px solid #ffbf00; padding-right: 20px; margin-bottom: 30px;
 }
 
-a {
-	color: inherit;
+.portfolio-container { width: 100%; overflow: hidden; padding: 20px 0; margin-bottom: 40px; }
+.portfolio-scroll-track {
+  display: flex; gap: 10px; width: max-content;
+  animation: scroll-infinite 30s linear infinite;
 }
 
-.info {
-	z-index: 1;
-	position: absolute;
-	inset-block-start: 0;
-	inset-inline: 0;
-	padding: .75rem;
-	margin-inline: auto;
-	inline-size: fit-content;
-	max-inline-size: min(60rem, 100vw - 10rem);
-	background-color: #1117;
-	--backdrop-filter: blur(.4rem);
-	-webkit-backdrop-filter: var(--backdrop-filter);
-	backdrop-filter: var(--backdrop-filter);
-	border-radius: .6rem;
-	border-start-start-radius: 0;
-	border-start-end-radius: 0;
-	text-align: center;
-	box-shadow: 0 0 1.5rem #0006;
-	display: flex;
-	align-items: center;
-	gap: 1rem;
-
-	& strong {
-		color: gold;
-	}
-
-	& .text {
-		display: flex;
-		flex-direction: column;
-		gap: .3rem;
-	}
-
-	& .close {
-		padding-inline: .3rem;
-
-		&::before {
-			content: "⨉";
-			font-size: 1.5rem;
-		}
-
-		& > input[type=checkbox] {
-			position: absolute;
-			opacity: 0;
-			pointer-events: none;
-		}
-	}
-
-	&:has(.close > input[type=checkbox]:checked) {
-		display: none;
-	}
-
-	& .not-supported {
-		border: 2px solid red;
-		background-color: #f004;
-		border-radius: .7rem;
-		padding: .6rem .4rem;
-	}
-
-	@supports selector(:has(a)) {
-		& .not-supported {
-			display: none;
-		}
-	}
+.portfolio-item { 
+  width: 300px; height: 300px;
+  flex-shrink: 0; border: none; background: transparent;
+  transition: transform 0.3s ease; overflow: hidden; cursor: zoom-in;
+}
+.portfolio-item:hover { transform: scale(1.05); }
+.portfolio-item img { 
+  width: 100%; height: 100%; object-fit: cover;
+  display: block; image-rendering: pixelated; border-radius: 4px; 
 }
 
-.controls {
-	z-index: 1;
-	position: absolute;
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: center;
-	align-items: center;
-	gap: 1.25rem;
-	border-radius: 1rem;
-	box-shadow: 0 0 1.5rem #0006;
-	background-color: #2228;
-	--backdrop-filter: blur(.3rem);
-	-webkit-backdrop-filter: var(--backdrop-filter);
-	backdrop-filter: var(--backdrop-filter);
-	padding: .75rem;
-	margin-block-end: .75rem;
-	inset-block-end: 0;
-	inset-inline: 0;
-	margin-inline: auto;
-	inline-size: fit-content;
-	max-inline-size: calc(100vw - 4rem);
-
-	& .block-chooser {
-		display: flex;
-		align-items: center;
-		gap: .5rem;
-
-		& > label {
-			display: block;
-			inline-size: 3rem;
-			block-size: 3rem;
-			border-radius: .3rem;
-			box-sizing: border-box;
-			background-size: 100% 100%;
-			background-repeat: no-repeat;
-			image-rendering: pixelated;
-			outline-offset: 1px;
-
-			@each $block in $blocks {
-				&.#{$block} {
-					background-image: var(--#{$block}-image);
-				}
-			}
-
-			&.air {
-				// background-color: #fff2;
-				// --line-thickness: 5px;
-				// background-image: linear-gradient(
-				// 	-50grad,
-			/* SCSS @each removed. Manually list block classes for valid CSS: */
-			&.air { background-image: var(--air-image); }
-			&.stone { background-image: var(--stone-image); }
-			&.grass { background-image: var(--grass-image); }
-			&.dirt { background-image: var(--dirt-image); }
-			&.log { background-image: var(--log-image); }
-			&.air {
-				background-image: var(--pickaxe-image);
-			}
-
-			& > input[type=radio] {
-				position: absolute;
-				opacity: 0;
-				pointer-events: none;
-			}
-		}
-	}
-
-	@each $block, $_ in $blocks {
-		&:has(> .block-chooser > .#{$block} > input[type=radio]:checked) ~ .content .cubes-container > .cube:not(.#{$block}) {
-			display: none;
-		}
-	}
-
-	& .move-buttons {
-		display: flex;
-		align-items: center;
-		gap: .5rem;
-
-		& > button {
-			display: block;
-			inline-size: 3rem;
-			block-size: 3rem;
-			border: none;
-	/* SCSS @each removed. Manually list block selectors for valid CSS: */
-	&:has(> .block-chooser > .air > input[type=radio]:checked) ~ .content .cubes-container > .cube:not(.air) {
-		display: none;
-	}
-	&:has(> .block-chooser > .stone > input[type=radio]:checked) ~ .content .cubes-container > .cube:not(.stone) {
-		display: none;
-	}
-	&:has(> .block-chooser > .grass > input[type=radio]:checked) ~ .content .cubes-container > .cube:not(.grass) {
-		display: none;
-	}
-	&:has(> .block-chooser > .dirt > input[type=radio]:checked) ~ .content .cubes-container > .cube:not(.dirt) {
-		display: none;
-	}
-	&:has(> .block-chooser > .log > input[type=radio]:checked) ~ .content .cubes-container > .cube:not(.log) {
-		display: none;
-	}
-	&:has(> .block-chooser > .leaves > input[type=radio]:checked) ~ .content .cubes-container > .cube:not(.leaves) {
-		display: none;
-	}
-	&:has(> .block-chooser > .glass > input[type=radio]:checked) ~ .content .cubes-container > .cube:not(.glass) {
-		display: none;
-	}
-				background-color: #0005;
-			}
-
-			&:active {
-				background-color: #0007;
-			}
-
-			&:is(.forwards, .clockwise, .look-up) {
-				margin-inline-start: .75rem;
-			}
-		}
-	}
-
-	&:has(> .move-buttons > .up:active) ~ .content .down {
-		animation-play-state: running;
-	}
-	&:has(> .move-buttons > .down:active) ~ .content .up {
-		animation-play-state: running;
-	}
-	&:has(> .move-buttons > .clockwise:active) ~ .content .clockwise {
-		animation-play-state: running;
-	}
-	&:has(> .move-buttons > .counterclockwise:active) ~ .content .counterclockwise {
-		animation-play-state: running;
-	}
-	&:has(> .move-buttons > .forwards:active) ~ .content .backwards {
-		animation-play-state: running;
-	}
-	&:has(> .move-buttons > .backwards:active) ~ .content .forwards {
-		animation-play-state: running;
-	}
-	&:has(> .move-buttons > .look-up:active) ~ .content .look-up {
-		animation-play-state: running;
-	}
-	&:has(> .move-buttons > .look-down:active) ~ .content .look-down {
-		animation-play-state: running;
-	}
+/* تعديل الـ Lightbox: تعتيم أخف وبدون إطارات */
+.lightbox {
+  display: none; position: fixed; z-index: 1000;
+  left: 0; top: 0; width: 100%; height: 100%;
+  background-color: rgba(0,0,0,0.7); /* تقليل التعتيم من 0.95 إلى 0.7 */
+  justify-content: center; align-items: center;
 }
 
-
-.content {
-	rotate: x -50grad;
-
-	--animation-duration: 10000s;
-	--max-translation: 400000rem;
-	--max-rotation: 3000turn;
-
-	& .initial-camera-position {
-		translate: 0 calc(var(--layers) * var(--cube-size) * .4) calc(var(--camera-distance) - var(--rows) * var(--cube-size) * .9);
-	}
-
-	&, & .look-up, & .look-down {
-		transform-origin: 0 0 var(--camera-distance);
-	}
-
-	& .look-up {
-		animation: var(--animation-duration) linear 1ms paused look-up;
-		@keyframes look-up {
-			from {
-				rotate: x 0turn;
-			}
-			to {
-				rotate: x calc(var(--max-rotation));
-			}
-		}
-	}
-	& .look-down {
-		animation: var(--animation-duration) linear 1ms paused look-down;
-		@keyframes look-down {
-			from {
-				rotate: x 0turn;
-			}
-			to {
-				rotate: x calc(-1 * var(--max-rotation));
-			}
-		}
-	}
-	& .down {
-		animation: var(--animation-duration) linear 1ms paused move-down;
-		@keyframes move-down {
-			from {
-				translate: 0 0;
-			}
-			to {
-				translate: 0 calc(var(--max-translation));
-			}
-		}
-	}
-	& .up {
-		animation: var(--animation-duration) linear 1ms paused move-up;
-		@keyframes move-up {
-			from {
-				translate: 0 0;
-			}
-			to {
-				translate: 0 calc(-1 * var(--max-translation));
-			}
-		}
-	}
-	& .forwards {
-		animation: var(--animation-duration) linear 1ms paused move-forwards;
-		@keyframes move-forwards {
-			from {
-				translate: 0 0 0;
-			}
-			to {
-				translate: 0 0 calc(-1 * var(--max-translation));
-			}
-		}
-	}
-	& .backwards {
-		animation: var(--animation-duration) linear 1ms paused move-backwards;
-		@keyframes move-backwards {
-			from {
-				translate: 0 0 0;
-			}
-			to {
-				translate: 0 0 calc(var(--max-translation));
-			}
-		}
-	}
-	& .clockwise {
-		animation: var(--animation-duration) linear 1ms paused rotate-clockwise;
-		@keyframes rotate-clockwise {
-			from {
-				rotate: y 0turn;
-			}
-			to {
-				rotate: y calc(-1 * var(--max-rotation));
-			}
-		}
-	}
-	& .counterclockwise {
-		animation: var(--animation-duration) linear 1ms paused rotate-counterclockwise;
-		@keyframes rotate-counterclockwise {
-			from {
-				rotate: y 0turn;
-			}
-			to {
-				rotate: y calc(var(--max-rotation));
-			}
-		}
-	}
-
-	.blocks {
-		position: relative;
-		translate: calc(-.5 * var(--columns) * var(--cube-size)) calc(-.5 * var(--layers) * var(--cube-size)) calc(-.5 * var(--rows) * var(--cube-size));
-
-		.cubes-container {
-			translate: calc(var(--column) * var(--cube-size)) calc(var(--layer) * var(--cube-size)) calc(var(--row) * var(--cube-size));
-			&:has(> .cube.air > input[type=radio]:checked) {
-				display: none;
-			}
-
-			/* SCSS @each removed. Manually list block selectors for valid CSS: */
-			&:has(> .cube.air > input[type=radio]:checked) {
-				--background-image: var(--air-image);
-			}
-			&:has(> .cube.stone > input[type=radio]:checked) {
-				--background-image: var(--stone-image);
-			}
-			&:has(> .cube.grass > input[type=radio]:checked) {
-				--background-image: var(--grass-image);
-			}
-			&:has(> .cube.dirt > input[type=radio]:checked) {
-				--background-image: var(--dirt-image);
-			}
-			&:has(> .cube.log > input[type=radio]:checked) {
-				--background-image: var(--log-image);
-			}
-			&:has(> .cube.leaves > input[type=radio]:checked) {
-				--background-image: var(--leaves-image);
-			}
-			&:has(> .cube.glass > input[type=radio]:checked) {
-				--background-image: var(--glass-image);
-			}
-			}
-
-			.cube {
-				position: absolute;
-				block-size: var(--cube-size);
-				inline-size: var(--cube-size);
-
-				& > input[type=radio] {
-					position: absolute;
-					opacity: 0;
-					pointer-events: none;
-				}
-
-				& > label {
-					position: absolute;
-					inset: 0;
-					background-image: var(--background-image);
-					image-rendering: pixelated;
-					background-size: 100% 100%;
-					// backface-visibility: hidden;
-					transform-origin: center center calc(-1 * var(--cube-size) / 2);
-					translate: 0 0 calc(var(--cube-size) / 2);
-					box-sizing: border-box;
-
-					&:hover {
-						--outline-width: calc(var(--cube-size) / 24);
-						outline: var(--outline-width) solid white;
-						outline-offset: calc(-1 * var(--outline-width));
-					}
-
-					&.front {
-						rotate: y 0grad;
-					}
-					&.back {
-						rotate: y 200grad;
-					}
-			&:has(> .cube.grass > input[type=radio]:checked) > .cube > label.top {
-				background-image: var(--grass-top-image);
-			}
-			&:has(> .cube.grass > input[type=radio]:checked) > .cube > label.bottom {
-				background-image: var(--dirt-image);
-			}
-
-			&:has(> .cube.log > input[type=radio]:checked) > .cube > label.top,
-			&:has(> .cube.log > input[type=radio]:checked) > .cube > label.bottom {
-				background-image: var(--log-top-image);
-			}
-
-			&:has(> .cube.grass > input[type=radio]:checked) > .cube > label {
-				&.top {
-					background-image: var(--grass-top-image);
-				}
-				&.bottom {
-					background-image: var(--dirt-image);
-				}
-			}
-
-			&:has(> .cube.log > input[type=radio]:checked) > .cube > label {
-				&:is(.top, bottom) {
-					background-image: var(--log-top-image);
-				}
-			}
-		}
-	}
+.lightbox-container {
+  position: relative; width: 90%; max-width: 1000px;
+  background: #222; 
+  border: none; /* إزالة الـ border الأصفر من حول المودال */
+  border-radius: 12px;
+  overflow: hidden; animation: modalIn 0.3s ease;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.5); /* ظل ناعم بدلاً من الإطار */
 }
 
+@keyframes modalIn {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.lightbox-body { display: flex; flex-direction: row-reverse; min-height: 400px; }
+
+.lightbox-img-side {
+  flex: 2; background: #111; display: flex;
+  justify-content: center; align-items: center; padding: 20px;
+}
+.lightbox-img-side img { 
+  max-width: 100%; max-height: 75vh; 
+  image-rendering: pixelated; 
+  border: none; /* إزالة أي إطار حول الصورة المكبرة */
+}
+
+.lightbox-info-side {
+  flex: 1; padding: 40px 30px; color: white;
+  background: #2a2a2a; border-right: 1px solid #444;
+}
+.lightbox-info-side h3 {
+  margin-top: 0; color: #ffbf00; font-size: 1.8em;
+  border-bottom: 2px solid #ffbf00; display: inline-block; margin-bottom: 20px;
+}
+.lightbox-info-side p { line-height: 1.8; font-size: 1.1em; opacity: 0.9; }
+
+.close-lightbox {
+  position: absolute; top: 15px; left: 20px;
+  color: #fff; font-size: 35px; cursor: pointer; z-index: 10;
+  text-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+.close-lightbox:hover { color: #ffbf00; }
+
+@media (max-width: 768px) {
+  .lightbox-body { flex-direction: column; }
+  .lightbox-info-side { border-right: none; border-top: 1px solid #444; }
+}
+
+#copy-modal {
+  visibility: hidden; opacity: 0; position: fixed; bottom: 30px; left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  background: #333; color: #fff; padding: 10px 25px;
+  border: 2px solid #ffbf00; transition: 0.3s; z-index: 100;
+}
+#copy-modal.show { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(0); }
+
+.links a { color: #ffbf00; text-decoration: none; }
+.links a:hover { text-decoration: underline; }

@@ -1,727 +1,163 @@
-<!-- ...existing code... -->
 <!DOCTYPE html>
-<html lang="en" dir="rtl">
+<html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>Lemon-e | Expert Lemon-e</title>
-    <link href="https://fonts.googleapis.com/css?family=Press+Start+2P&display=swap" rel="stylesheet">
-    <style>
-        /* Tetris Background and Base Styles */
-        body {
-            margin: 0;
-            background: #141414;
-            overflow: hidden;
-            font-family: 'ARPixels', monospace;
-            direction: rtl;
-        }
-        canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 1; /* Tetris canvases are in the back */
-        }
-        
-        /* Font Definition (Assuming ar-pixel.ttf is available) */
-        @font-face {
-            font-family: 'ARPixels';
-            src: url('ar-pixel.ttf') format('truetype');
-            font-weight: normal;
-            font-style: normal;
-        }
-
-        /* Profile Card Styling */
-        .center {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            z-index: 10; /* Profile content is on top */
-            background: rgba(80, 80, 80, 0.7);
-            padding: 20px;
-            box-sizing: border-box;
-            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
-        }
-        .lemon-img {
-            width: 180px;
-            height: 180px;
-            border-radius: 50%;
-            background: #505050;
-            box-shadow: 0 0 40px 8px #222;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 2vw;
-            overflow: hidden;
-        }
-        .lemon-img img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 50%;
-            image-rendering: pixelated;
-            background: #505050;
-            display: block;
-            /* --- ANTI-THEFT STYLES (منع السحب والنسخ) --- */
-            user-select: none;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-        }
-        h1 {
-            font-size: 3em;
-            font-weight: bold;
-            margin: 0 0 1vw 0;
-            color: #fff;
-            text-align: center;
-            letter-spacing: 2px;
-            direction: ltr;
-            transition: text-shadow 0.1s; /* smooth transition when mouse leaves */
-            cursor: default; /* Optional: indicates non-clickable text */
-        }
-        .en {
-            font-family: 'Press Start 2P', monospace !important;
-            direction: ltr;
-            color: #fff;
-        }
-        .desc {
-            font-size: 1.2em;
-            margin: 1vw 0 3vw 0;
-            color: #dedede;
-            text-align: center;
-            line-height: 2em;
-            font-family: 'ARPixels', monospace;
-            direction: rtl;
-            max-width: 80%;
-        }
-        .icons {
-            display: flex;
-            gap: 2vw;
-            margin: 2vw 0;
-            justify-content: center;
-            align-items: center;
-        }
-        .icon-separator {
-            display: inline-block;
-            width: 1vw;
-            height: 54px;
-            border-left: 2px solid #888;
-            margin: 0 0.2vw;
-            opacity: 0.5;
-            vertical-align: middle;
-        }
-        .icons > .icon-separator:last-child {
-            display: none;
-        }
-        .icon {
-            width: 54px;
-            height: 54px;
-            fill: #fff;
-            transition: fill 0.2s, transform 0.2s;
-            cursor: pointer;
-            image-rendering: pixelated;
-            background: none;
-            border: none;
-            box-shadow: none;
-            border-radius: 0;
-            padding: 0;
-            display: inline-block;
-        }
-        .icon:hover {
-            fill: #dedede;
-            transform: scale(1.09) rotate(-2deg);
-            filter: brightness(1.2);
-        }
-        .links {
-            margin-top: 2vw;
-            color: #bbbbbb;
-            font-size: 1em;
-            text-align: center;
-            font-family: 'ARPixels', monospace;
-            letter-spacing: 2px;
-            direction: ltr;
-        }
-        .links a {
-            color: #bbbbbb;
-            text-decoration: none;
-            margin: 0 10px;
-            transition: color 0.2s;
-            font-weight: bold;
-            font-family: 'Press Start 2P', monospace;
-        }
-        .links a:hover {
-            color: #fff;
-            text-decoration: underline;
-        }
-
-        /* Tooltip and Copy Modal Styles */
-        #copy-modal {
-            display:none;
-            position:fixed;
-            left:50%;
-            top:3vh;
-            transform:translateX(-50%) scale(0.8);
-            background:#222;
-            color:#fff;
-            padding:4px 10px;
-            border-radius:6px;
-            font-size:0.8em;
-            font-family:'Press Start 2P',monospace;
-            z-index:9999;
-            box-shadow:0 2px 8px #000;
-            opacity:0;
-            transition:opacity 0.5s cubic-bezier(.7,-0.5,.3,1.5),transform 0.5s cubic-bezier(.7,-0.5,.3,1.5);
-            pointer-events:none;
-            text-align:center;
-        }
-        
-        /* --- UPDATED INTERACTIVE FEATURE: GLITCH TRAIL --- */
-        #glitch-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none; 
-            z-index: 99; 
-        }
-        .glitch-block {
-            position: absolute;
-            /* No transitions here, managed by JS/requestAnimationFrame */
-        }
-
-        /* --- NEW FEATURE: TEXT GLITCH EFFECT --- */
-        @keyframes glitch-flicker {
-            0% {
-                text-shadow: 2px 2px #FF3366, -2px -2px #33CCFF; /* Red/Blue separation */
-                transform: translate(0, 0);
-            }
-            10% {
-                text-shadow: -2px -2px #FF3366, 2px 2px #33CCFF;
-                transform: translate(1px, -1px);
-            }
-            15% {
-                text-shadow: 4px 4px #FF3366, -4px -4px #33CCFF;
-                transform: translate(0, 2px);
-            }
-            20% {
-                text-shadow: -2px 0 #FF3366, 2px 0 #33CCFF;
-                transform: translate(-1px, 0);
-            }
-            25% {
-                text-shadow: 0 0 #FF3366, 0 0 #33CCFF; /* Reset to normal */
-                transform: translate(0, 0);
-            }
-            100% {
-                text-shadow: 0 0 #FF3366, 0 0 #33CCFF;
-                transform: translate(0, 0);
-            }
-        }
-        
-        h1:hover {
-            /* Glitch animation applied on hover */
-            animation: glitch-flicker 0.4s steps(4) infinite alternate;
-        }
-
-
-        /* Media Queries */
-        @media (max-width: 600px) {
-            h1 { font-size: 1em; }
-            .desc, .links { font-size: 0.6em; }
-            .icon { width: 32px; height: 32px; }
-            .lemon-img { width: 100px; height: 100px; }
-            .icon-separator { height: 32px; width: 1vw; margin: 0 1vw; }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Lemon-e | Portfolio</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    
-    <!-- Container for the mouse glitch effect -->
-    <div id="glitch-container"></div>
 
-    <div class="center">
-        <div class="lemon-img">
-            <!-- الصورة الآن محمية ضد السحب والزر الأيمن -->
-            <img 
-                src="https://img.itch.zone/aW1nLzIzMDMwNjk0LmdpZg==/original/F4ie2e.gif" 
-                alt="Lemon-e avatar" 
-                draggable="false" 
-                oncontextmenu="return false;"
-            />
-        </div>
-        <h1>Lemon-e</h1> <!-- هذا هو العنصر الذي يتأثر بـ Glitch عند التمرير -->
-        <div class="desc">
-            ㅤㅤHello! ... I'm Lemon-e <br>
-            Digital artist and C#, Python developer
-        </div>
-        <div class="icons">
-            <div id="copy-modal">
-                Copied to clipboard <span style="font-size:0.8em;">✅</span>
-            </div>
-            <a href="#" class="discord-icon" title="Discord">
-                <svg class="icon" viewBox="0 0 71 55" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <g clip-path="url(#clip0)">
-                        <path d="M60.1045 4.8978C55.5792 2.8214 50.7265 1.2916 45.6527 0.41542C45.5603 0.39851 45.468 0.440769 45.4204 0.525289C44.7963 1.6353 44.105 3.0834 43.6209 4.2216C38.1637 3.4046 32.7345 3.4046 27.3892 4.2216C26.905 3.0581 26.1886 1.6353 25.5617 0.525289C25.5141 0.443589 25.4218 0.40133 25.3294 0.41542C20.2584 1.2888 15.4057 2.8186 10.8776 4.8978C10.8384 4.9147 10.8048 4.9429 10.7825 4.9795C1.57795 18.7309 -0.943561 32.1443 0.293408 45.3914C0.299005 45.4562 0.335386 45.5182 0.385761 45.5576C6.45866 50.0174 12.3413 52.7249 18.1147 54.5195C18.2071 54.5477 18.305 54.5139 18.3638 54.4378C19.7295 52.5728 20.9469 50.6063 21.9907 48.5383C22.0523 48.4172 21.9935 48.2735 21.8676 48.2256C19.9366 47.4931 18.0979 46.6 16.3292 45.5858C16.1893 45.5041 16.1781 45.304 16.3068 45.2082C16.679 44.9293 17.0513 44.6391 17.4067 44.3461C17.471 44.2926 17.5606 44.2813 17.6362 44.3151C29.2558 49.6202 41.8354 49.6202 53.3179 44.3151C53.3935 44.2785 53.4831 44.2898 53.5502 44.3433C53.9057 44.6363 54.2779 44.9293 54.6529 45.2082C54.7816 45.304 54.7732 45.5041 54.6333 45.5858C52.8646 46.6197 51.0259 47.4931 49.0921 48.2228C48.9662 48.2707 48.9102 48.4172 48.9718 48.5383C50.038 50.6034 51.2554 52.5699 52.5959 54.435C52.6519 54.5139 52.7526 54.5477 52.845 54.5195C58.6464 52.7249 64.529 50.0174 70.6019 45.5576C70.6551 45.5182 70.6887 45.459 70.6943 45.3942C72.1747 30.0791 68.2147 16.7757 60.1968 4.9823C60.1772 4.9429 60.1437 4.9147 60.1045 4.8978ZM23.7259 37.3253C20.2276 37.3253 17.3451 34.1136 17.3451 30.1693C17.3451 26.225 20.1717 23.0133 23.7259 23.0133C27.308 23.0133 30.1626 26.2532 30.1066 30.1693C30.1066 34.1136 27.28 37.3253 23.7259 37.3253ZM47.3178 37.3253C43.8196 37.3253 40.9371 34.1136 40.9371 30.1693C40.9371 26.225 43.7636 23.0133 47.3178 23.0133C50.9 23.0133 53.7545 26.2532 53.6986 30.1693C53.6986 34.1136 50.9 37.3253 47.3178 37.3253Z" fill="#fff"/>
-                    </g>
-                    <defs>
-                        <clipPath id="clip0">
-                            <rect width="71" height="55" fill="white"/>
-                        </clipPath>
-                    </defs>
-                </svg>
-                <span class="icon-tooltip" style="display:none;">oh_no_cringoo</span>
-            </a>
-            <a href="#" class="email-icon" title="Email">
-                <svg class="icon" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
-                    <g>
-                        <polygon points="0,127.5 0,274.219 104.8,206.1"/>
-                        <polygon points="400,274.219 400,127.5 295.2,206.1"/>
-                        <polygon points="200,277.5 130.357,225.268 0,310 0,340 400,340 400,310 269.643,225.268"/>
-                        <polygon points="0,90 200,240 400,90 400,60 0,60"/>
-                    </g>
-                </svg>
-                <span class="icon-tooltip" style="display:none;">example@gmail.com</span>
-            </a>
-            <span class="icon-separator"></span>
-            <a href="https://error404-x.itch.io" target="_blank" rel="noopener noreferrer" title="itch.io">
-                <img src="https://img.itch.zone/aW1nLzIzMjkzNjI0LnBuZw==/original/lWMo7d.png" class="icon" alt="itch.io" style="background:none;" />
-            </a>
-            <a href="https://github.com/lemon-ex" target="_blank" rel="noopener noreferrer" title="GitHub">
-                <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24">
-                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                </svg>
-            </a>
-        </div>
-        <div class="links">
-            <a href="https://discord.com/oauth2/authorize?client_id=1391024015942090915&permissions=8&integration_type=0&scope=bot" target="_blank" rel="noopener noreferrer">Alabd Bot</a> &bull;
-            <a href="https://www.patreon.com/c/Error404300" target="_blank" rel="noopener noreferrer">Donate</a>
-        </div>
+  <div class="center">
+    <div class="lemon-img">
+      <img src="https://img.itch.zone/aW1nLzI2NDYzMjg0LnBuZw==/original/xWMzrB.png" alt="Lemon-e avatar" />
     </div>
 
-<script>
-    'use strict';
+    <h1>ليموني</h1>
 
-    // --- TETRIS BACKGROUND LOGIC (UNCHANGED) ---
+    <div class="desc">
+      <span class="welcome-text">أهلا ! أنا ليموني :)</span><br>
+      <span class="job-text">رسام Pixel Art</span>
+    </div>
+
+    <div class="social-links">
+      <div class="social-btn" id="discord">
+        <svg viewBox="0 0 127.14 96.36"><path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.71,32.65-1.82,56.6.48,80.21h0A105.73,105.73,0,0,0,32.47,96.36,77.7,77.7,0,0,0,39.2,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.73,11.1,105.32,105.32,0,0,0,32.05-16.14h0C130.11,50.4,121.5,26.72,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74S96.23,46,96.12,53,91.07,65.69,84.69,65.69Z" fill="white"/></svg>
+        <span>Discord</span>
+      </div>
+
+      <a href="https://github.com/lemon-ex" target="_blank" class="social-btn" id="github">
+        <svg viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" fill="white"/></svg>
+        <span>Github</span>
+      </a>
+
+      <a href="https://error404-x.itch.io" target="_blank" class="social-btn" id="itch">
+        <img src="https://img.itch.zone/aW1nLzIzMjkzNjI0LnBuZw==/original/lWMo7d.png" alt="itch">
+        <span>Itch.io</span>
+      </a>
+
+      <div class="social-btn" id="email">
+        <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" fill="white"/></svg>
+        <span>Email</span>
+      </div>
+    </div>
+
+    <div class="image-separator"></div>
+
+    <h2 class="section-title">أعمالي</h2>
     
-    var tetrominos = [{
-        // box - Blue
-        colors : ['rgb(59,84,165)', 'rgb(118,137,196)', 'rgb(79,111,182)'],
-        data : [[0, 0, 0, 0], [0, 1, 1, 0], [0, 1, 1, 0], [0, 0, 0, 0]]
-        },
-        {
-        // stick - Red
-        colors : ['rgb(214,30,60)', 'rgb(241,108,107)', 'rgb(236,42,75)'],
-        data : [[0, 0, 0, 0], [0, 0, 0, 0], [1, 1, 1, 1], [0, 0, 0, 0]]
-        },
-        {
-        // z - Green
-        colors : ['rgb(88,178,71)', 'rgb(150,204,110)', 'rgb(115,191,68)'],
-        data : [[0, 0, 0, 0], [0, 1, 1, 0], [0, 0, 1, 1], [0, 0, 0, 0]]
-        },
-        {
-        // T - Cyan
-        colors : ['rgb(62,170,212)', 'rgb(120,205,244)', 'rgb(54,192,240)'],
-        data : [[0, 0, 0, 0], [0, 1, 1, 1], [0, 0, 1, 0], [0, 0, 0, 0]]
-        },
-        {
-        // s - Orange
-        colors : ['rgb(236,94,36)', 'rgb(234,154,84)', 'rgb(228,126,37)'],
-        data : [[0, 0, 0, 0], [0, 1, 1, 0], [1, 1, 0, 0], [0, 0, 0, 0]]
-        },
-        {
-        // backwards L - Yellow
-        colors : ['rgb(220,159,39)', 'rgb(246,197,100)', 'rgb(242,181,42)'],
-        data : [[0, 0, 1, 0], [0, 0, 1, 0], [0, 1, 1, 0], [0, 0, 0, 0]]
-        },
-        {
-        // L - Purple
-        colors : ['rgb(158,35,126)', 'rgb(193,111,173)', 'rgb(179,63,151)'],
-        data : [[0, 1, 0, 0], [0, 1, 0, 0], [0, 1, 1, 0], [0, 0, 0, 0]]
-        }];
-
-    var Tetris = function(x,y,width,height){
-        this.posX = x || 0;
-        this.posY = y || 0;
-
-        this.width = width || window.innerWidth;
-        this.height = height || window.innerHeight;
-
-        this.bgCanvas = document.createElement('canvas');
-        this.fgCanvas = document.createElement('canvas');
-
-        this.bgCanvas.width = this.fgCanvas.width = this.width;
-        this.bgCanvas.height = this.fgCanvas.height = this.height;
-
-        this.bgCtx = this.bgCanvas.getContext('2d');
-        this.fgCtx = this.fgCanvas.getContext('2d');
-
-        this.bgCanvas.style.left = this.posX + 'px';
-        this.bgCanvas.style.top = this.posY + 'px';
-
-        this.fgCanvas.style.left = this.posX + 'px';
-        this.fgCanvas.style.top = this.posY + 'px';
+    <div class="portfolio-container">
+      <div class="portfolio-scroll-track">
+        <div class="portfolio-item">
+          <img src="https://img.itch.zone/aW1nLzI2NDYzNTU3LnBuZw==/original/INEj42.png" 
+               data-title="ليمون بكسل" 
+               data-description="تصميم بكسل آرت لشخصية ليمون بأسلوب الريترو.">
+        </div>
         
-        this.bgCanvas.style.zIndex = '1';
-        this.fgCanvas.style.zIndex = '2';
+        <div class="portfolio-item">
+          <img src="https://img.itch.zone/aW1nLzI2NDYzNTYyLnBuZw==/original/8fRjde.png" 
+               data-title="غابة البكسل" 
+               data-description="رسمة بيئة طبيعية للعبة مغامرات.">
+        </div>
 
-        document.body.appendChild(this.bgCanvas);
-        document.body.appendChild(this.fgCanvas);
-        this.init();
-    };
+        <div class="portfolio-item">
+          <img src="https://img.itch.zone/aW1nLzI2NDYzNTY1LmdpZg==/original/9U4H73.gif" 
+               data-title="تحريك شخصية" 
+               data-description="أنميشن GIF يوضح حركة المشي بأسلوب البكسل.">
+        </div>
 
-    Tetris.prototype.init = function(){
-        this.curPiece = {
-            data : null,
-            colors : [0,0,0],
-            x : 0,
-            y : 0,
-        };
+        <div class="portfolio-item">
+          <img src="https://img.itch.zone/aW1nLzI2NDYzNTY4LnBuZw==/original/J8hM2Y.png" 
+               data-title="إضاءة ليلية" 
+               data-description="تجربة توزيع الإضاءة في عالم بكسلي.">
+        </div>
 
-        this.lastMove = Date.now();
-        this.curSpeed = 50+Math.random()*50;
-        this.unitSize = 20;
-        this.linesCleared = 0;
-        this.level = 0;
-        this.loseBlock = 0;
+        <div class="portfolio-item">
+          <img src="https://img.itch.zone/aW1nLzI2NDYzNTc2LnBuZw==/original/c9di64.png" 
+               data-title="خريطة العالم" 
+               data-description="تصميم خريطة بكسلية للعبة آر بي جي (RPG).">
+        </div>
+        
+        <div class="portfolio-item">
+          <img src="https://img.itch.zone/aW1nLzI2NDYzNTU3LnBuZw==/original/INEj42.png" 
+               data-title="ليمون بكسل" 
+               data-description="تصميم بكسل آرت لشخصية ليمون بأسلوب الريترو.">
+        </div>
+        <div class="portfolio-item">
+          <img src="https://img.itch.zone/aW1nLzI2NDYzNTYyLnBuZw==/original/8fRjde.png" 
+               data-title="غابة البكسل" 
+               data-description="رسمة بيئة طبيعية للعبة مغامرات.">
+        </div>
+      </div>
+    </div>
 
-        this.board = [];
-        this.boardWidth = Math.floor(this.width / this.unitSize);
-        this.boardHeight = Math.floor(this.height / this.unitSize);
+    <div class="links">
+      <a href="https://discord.com/oauth2/authorize?client_id=1391024015942090915&permissions=8" target="_blank">Alabd Bot</a> &bull; 
+      <a href="https://www.patreon.com/c/Error404300" target="_blank">Donate</a>
+    </div>
+  </div>
 
-        var board = this.board,
-            boardWidth = this.boardWidth,
-            boardHeight = this.boardHeight,
-            halfHeight = boardHeight/2,
-            curPiece = this.curPiece,
-            x = 0, y = 0;
+  <div id="image-lightbox" class="lightbox">
+    <div class="lightbox-container" id="modal-container">
+      <span class="close-lightbox">&times;</span>
+      <div class="lightbox-body">
+        <div class="lightbox-img-side">
+          <img id="full-img">
+        </div>
+        <div class="lightbox-info-side">
+          <h3 id="img-title">العنوان</h3>
+          <p id="img-description">الوصف هنا</p>
+        </div>
+      </div>
+    </div>
+  </div>
 
-        for (x = 0; x <= boardWidth; x++) {
-            board[x] = [];
-            for (y = 0; y <= boardHeight; y++) {
+  <div id="copy-modal">تم النسخ ✅</div>
 
-                board[x][y] = {
-                    data: 0,
-                    colors: ['rgb(0,0,0)', 'rgb(0,0,0)', 'rgb(0,0,0)']
-                };
-
-                if(Math.random() > 0.15 && y > halfHeight){
-                    board[x][y] = {
-                        data: 1,
-                        colors: tetrominos[Math.floor(Math.random() * tetrominos.length)].colors
-                    };
-                }
-            }
-        }
-
-        for (x = 0; x <= boardWidth; x++) {
-            for (y = boardHeight-1; y > -1; y--) {
-
-                if(board[x][y].data === 0 && y > 0){
-                    for(var yy = y; yy > 0; yy--){
-                        if(board[x][yy-1].data){
-
-                            board[x][yy].data = 1;
-                            board[x][yy].colors = board[x][yy-1].colors;
-
-                            board[x][yy-1].data = 0;
-                            board[x][yy-1].colors = ['rgb(0,0,0)', 'rgb(0,0,0)', 'rgb(0,0,0)'];
-                        }
-                    }
-                }
-            }
-        }
-
-        var self = this;
-
-        if (tetrisInstances.length === 0) { 
-             window.addEventListener('keydown', function (e) {
-                switch (e.keyCode) {
-                    case 37: 
-                        if (self.checkMovement(self.curPiece, -1, 0)) { self.curPiece.x--; }
-                        break;
-                    case 39: 
-                        if (self.checkMovement(self.curPiece, 1, 0)) { self.curPiece.x++; }
-                        break;
-                    case 40: 
-                        if (self.checkMovement(self.curPiece, 0, 1)) { self.curPiece.y++; }
-                        break;
-                    case 32: 
-                    case 38: 
-                        self.curPiece.data = self.rotateTetrimono(self.curPiece);
-                        break;
-                }
-            });
-        }
-
-        this.checkLines();
-        this.renderBoard();
-        this.newTetromino();
-        this.update();
-    };
-
-
-    Tetris.prototype.update = function() {
-        var curPiece = this.curPiece;
-
-        if (!this.checkMovement(curPiece, 0, 1)) {
-            if (curPiece.y < -1) {
-                this.loseScreen();
-                return true;
-            } else {
-                this.fillBoard(curPiece);
-                this.newTetromino();
-            }
-        } else {
-            if (Date.now() > this.lastMove) {
-                this.lastMove = Date.now() + this.curSpeed;
-                if (this.checkMovement(curPiece, 0, 1)) {
-                    curPiece.y++;
-                } else {
-                    this.fillBoard(curPiece);
-                    this.newTetromino();
-                }
-            }
-        }
-
-        this.render();
-
-        var self = this;
-        requestAnimationFrame(function(){self.update();});
-    };
-
-    Tetris.prototype.renderBoard = function(){
-        var ctx = this.bgCtx, unitSize = this.unitSize, board = this.board, boardWidth = this.boardWidth;
-        ctx.clearRect(0, 0, this.bgCanvas.width, this.bgCanvas.height);
-        for (var x = 0; x <= boardWidth; x++) {
-            for (var y = 0; y <= this.boardHeight; y++) {
-                if (board[x][y].data !== 0) {
-                    var bX = (x * unitSize), bY = (y * unitSize);
-                    ctx.fillStyle = board[x][y].colors[0];
-                    ctx.fillRect(bX, bY, unitSize, unitSize);
-                    ctx.fillStyle = board[x][y].colors[1];
-                    ctx.fillRect(bX+2, bY+2, unitSize-4, unitSize-4);
-                    ctx.fillStyle = board[x][y].colors[2];
-                    ctx.fillRect(bX+4, bY+4, unitSize-8, unitSize-8);
-                }
-            }
-        }
-    };
-
-    Tetris.prototype.render = function() {
-        var ctx = this.fgCtx, unitSize = this.unitSize, curPiece = this.curPiece;
-        ctx.clearRect(0, 0, this.fgCanvas.width, this.fgCanvas.height);
-        for (var x = 0; x < 4; x++) {
-            for (var y = 0; y < 4; y++) {
-                if (curPiece.data[x][y] === 1) {
-                    var xPos = ((curPiece.x + x) * unitSize), yPos = ((curPiece.y + y) * unitSize);
-                    if (yPos > - 1) {
-                        ctx.fillStyle = curPiece.colors[0];
-                        ctx.fillRect(xPos, yPos, unitSize, unitSize);
-                        ctx.fillStyle = curPiece.colors[1];
-                        ctx.fillRect(xPos+2, yPos+2, unitSize-4, unitSize-4);
-                        ctx.fillStyle = curPiece.colors[2];
-                        ctx.fillRect(xPos+4, yPos+4, unitSize-8, unitSize-8);
-                    }
-                }
-            }
-        }
-    };
-
-    Tetris.prototype.checkMovement = function(curPiece, newX, newY) {
-        var piece = curPiece.data, posX = curPiece.x, posY = curPiece.y, board = this.board, boardWidth = this.boardWidth, boardHeight = this.boardHeight;
-
-        for (var x = 0; x < 4; x++) {
-            for (var y = 0; y < 4; y++) {
-                if (piece[x][y] === 1) {
-                    if (!board[posX + x + newX]) { board[posX + x + newX] = []; }
-                    if (!board[posX + x + newX][y + posY + newY]) { board[posX + x + newX][y + posY + newY] = { data: 0 }; }
-                    if (posX + x + newX >= boardWidth || posX + x + newX < 0 || board[posX + x + newX][y + posY + newY].data == 1) { return false; }
-                    if (posY + y + newY > boardHeight) { return false; }
-                }
-            }
-        }
-        return true;
-    };
-
-    Tetris.prototype.checkLines = function() {
-        var board = this.board, boardWidth = this.boardWidth, y = this.boardHeight + 1;
-
-        while (y--) {
-            var x = boardWidth, lines = 0;
-            while (x--) {
-                if (board[x][y].data === 1) { lines++; }
-            }
-
-            if (lines === boardWidth) {
-                var lineY = y;
-                while (lineY) {
-                    for (x = 0; x <= boardWidth; x++) {
-                        if (lineY - 1 > 0) {
-                            board[x][lineY].data = board[x][lineY - 1].data;
-                            board[x][lineY].colors = board[x][lineY - 1].colors;
-                        }
-                    }
-                    lineY--;
-                }
-                y++;
-            }
-        }
-    };
-
-    Tetris.prototype.loseScreen = function() {
-        var ctx = this.bgCtx, unitSize = this.unitSize, boardWidth = this.boardWidth, boardHeight = this.boardHeight, y = boardHeight - this.loseBlock;
-
-        for(var x = 0; x < boardWidth; x++){
-            var bX = (x * unitSize), bY = (y * unitSize);
-            ctx.fillStyle = 'rgb(80,80,80)';
-            ctx.fillRect(bX, bY, unitSize, unitSize);
-            ctx.fillStyle = 'rgb(150,150,150)';
-            ctx.fillRect(bX+2, bY+2, unitSize-4, unitSize-4);
-            ctx.fillStyle = 'rgb(100,100,100)';
-            ctx.fillRect(bX+4, bY+4, unitSize-8, unitSize-8);
-        }
-
-        if(this.loseBlock <= (boardHeight+1)){
-            this.loseBlock++;
-            var self = this;
-            requestAnimationFrame(function(){self.loseScreen();});
-        }else{
-            this.init();
-        }
-    };
-
-    Tetris.prototype.fillBoard = function(curPiece) {
-        var piece = curPiece.data, posX = curPiece.x, posY = curPiece.y, board = this.board;
-        for (var x = 0; x < 4; x++) {
-            for (var y = 0; y < 4; y++) {
-                if (piece[x][y] === 1) {
-                    board[x + posX][y + posY].data = 1;
-                    board[x + posX][y + posY].colors = curPiece.colors;
-                }
-            }
-        }
-        this.checkLines();
-        this.renderBoard();
-    };
-
-    Tetris.prototype.rotateTetrimono = function(curPiece) {
-        var rotated = [];
-        for (var x = 0; x < 4; x++) {
-            rotated[x] = [];
-            for (var y = 0; y < 4; y++) {
-                rotated[x][y] = curPiece.data[3 - y][x];
-            }
-        }
-
-        if (!this.checkMovement({ data: rotated, x: curPiece.x, y: curPiece.y }, 0, 0)) {
-            rotated = curPiece.data;
-        }
-
-        return rotated;
-    };
-
-    Tetris.prototype.newTetromino = function() {
-        var pieceNum = Math.floor(Math.random() * tetrominos.length), curPiece = this.curPiece;
-        curPiece.data = tetrominos[pieceNum].data;
-        curPiece.colors = tetrominos[pieceNum].colors;
-        curPiece.x = Math.floor(Math.random()*(this.boardWidth-curPiece.data.length+1));
-        curPiece.y = -4;
-    };
-
-    var width = window.innerWidth,
-        boardDiv = 20*Math.round(window.innerWidth/20),
-        boards = 8,
-        bWidth = boardDiv/boards,
-        tetrisInstances = [];
-
-    for(var w = 0; w < boards; w++){
-        tetrisInstances.push(new Tetris(20 * Math.round((w*bWidth)/20), 0, bWidth, window.innerHeight));
-    }
-    
-    // --- TOOLTIP & COPY LOGIC (UNCHANGED) ---
-    function showTooltip(icon) {
-        let tooltip = icon.querySelector('.icon-tooltip');
-        if (tooltip) {
-            tooltip.style.display = 'block';
-            tooltip.style.position = 'absolute';
-            tooltip.style.top = '110%';
-            tooltip.style.left = '50%';
-            tooltip.style.transform = 'translateX(-50%)';
-            tooltip.style.background = '#222';
-            tooltip.style.color = '#fff';
-            tooltip.style.padding = '6px 14px';
-            tooltip.style.borderRadius = '6px';
-            tooltip.style.fontSize = '1em';
-            tooltip.style.fontFamily = 'ARPixels, monospace';
-            tooltip.style.zIndex = '100';
-            tooltip.style.boxShadow = '0 2px 8px #000';
-            tooltip.style.opacity = '0';
-            tooltip.style.transition = 'opacity 0.4s cubic-bezier(.7,-0.5,.3,1.5),transform 0.4s cubic-bezier(.7,-0.5,.3,1.5)';
-            setTimeout(function(){
-                tooltip.style.opacity = '1';
-                tooltip.style.transform = 'translateX(-50%) scale(1.05)';
-            }, 10);
-        }
-    }
-    function hideTooltip(icon) {
-        let tooltip = icon.querySelector('.icon-tooltip');
-        if (tooltip) {
-            tooltip.style.opacity = '0';
-            tooltip.style.transform = 'translateX(-50%) scale(0.95)';
-            setTimeout(function(){ tooltip.style.display = 'none'; }, 350);
-        }
-    }
-    function showCopyModal() {
-        var modal = document.getElementById('copy-modal');
-            modal.style.display = 'block';
-            modal.style.opacity = '0';
-            modal.style.transform = 'translateX(-50%) scale(0.8)';
-            setTimeout(function(){
-                modal.style.opacity = '1';
-                modal.style.transform = 'translateX(-50%) scale(1.05)';
-            }, 10);
-            setTimeout(function(){
-                modal.style.opacity = '0';
-                modal.style.transform = 'translateX(-50%) scale(0.8)';
-                setTimeout(function(){ modal.style.display = 'none'; }, 500);
-            }, 1300);
-    }
-
-    // Attach copy and tooltip listeners
-    document.querySelectorAll('.discord-icon, .email-icon').forEach(function(icon) {
-        icon.addEventListener('mouseenter', function() { showTooltip(icon); });
-        icon.addEventListener('mouseleave', function() { hideTooltip(icon); });
-        icon.addEventListener('click', function(e) {
-            e.preventDefault();
-            var tooltip = icon.querySelector('.icon-tooltip');
-            if (tooltip) {
-                var text = tooltip.textContent;
-                if (navigator.clipboard) {
-                    navigator.clipboard.writeText(text).then(showCopyModal);
-                } else {
-                    var temp = document.createElement('textarea');
-                    temp.value = text;
-                    document.body.appendChild(temp);
-                    temp.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(temp);
-                    showCopyModal();
-                }
-            }
+  <script>
+    // نظام النسخ للحافظة
+    document.querySelectorAll('#discord, #email').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const text = btn.id === 'discord' ? 'lemone_0x' : 'lemon@example.com';
+        navigator.clipboard.writeText(text).then(() => {
+          const modal = document.getElementById('copy-modal');
+          modal.classList.add('show');
+          setTimeout(() => modal.classList.remove('show'), 2000);
         });
+      });
     });
 
-    // --- MOUSE GLITCH TRAIL LOGIC DISABLED ---
-    
-    document.addEventListener('DOMContentLoaded', function() {
-        // Glitch trail disabled — no listeners and no particle generation.
-        // If you want to remove the container from DOM entirely:
-        // const c = document.getElementById('glitch-container'); if (c) c.remove();
+    // نظام المودال الديناميكي
+    const lightbox = document.getElementById('image-lightbox');
+    const container = document.getElementById('modal-container');
+    const fullImg = document.getElementById('full-img');
+    const titleText = document.getElementById('img-title');
+    const descText = document.getElementById('img-description');
+    const closeBtn = document.querySelector('.close-lightbox');
+
+    document.querySelectorAll('.portfolio-item img').forEach(img => {
+      img.addEventListener('click', () => {
+        fullImg.src = img.src;
+        titleText.textContent = img.getAttribute('data-title') || "بدون عنوان";
+        descText.textContent = img.getAttribute('data-description') || "لا يوجد وصف لهذه الرسمة.";
+        
+        lightbox.style.display = 'flex';
+        container.classList.remove('closing'); // التأكد من إزالة أنميشن الإغلاق
+      });
     });
-</script>
+
+    function closeLightbox() {
+      container.classList.add('closing'); // تفعيل أنميشن الإغلاق
+      setTimeout(() => {
+        lightbox.style.display = 'none';
+        container.classList.remove('closing');
+      }, 300); // الانتظار حتى ينتهي الأنميشن
+    }
+
+    closeBtn.addEventListener('click', closeLightbox);
+    lightbox.addEventListener('click', (e) => { 
+      if(e.target === lightbox) closeLightbox(); 
+    });
+  </script>
 </body>
 </html>
-<!-- ...existing code... -->
-
