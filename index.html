@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>Lemone | Portfolio</title>
+  <link rel="icon" type="image/png" href="assets/gear-icon.png">
+
+  <style>
+    :root {
+      --bg: #3b302f;
+      --text: #cbbfb3;
+    }
+
+    @font-face {
+      font-family: "PixelAE";
+      src: url("assets/font/PixelAE-Bold.ttf") format("truetype");
+      font-weight: 700;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      cursor: none;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-user-drag: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: "PixelAE", -apple-system, BlinkMacSystemFont, "Segoe UI",
+                   Roboto, Helvetica, Arial, sans-serif;
+      font-weight: 700;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      min-height: 100vh;
+      padding: 2rem;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .graphic-container {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    #topoCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background-color: rgba(59, 49, 47, 0.55);
+    }
+
+    #custom-cursor {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 36px;
+      height: 36px;
+      z-index: 9999;
+      pointer-events: none;
+      image-rendering: pixelated;
+      will-change: transform;
+    }
+
+    #custom-cursor.pressed {
+      transition: transform 0.06s ease;
+    }
+
+    .container {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+      transform: translateY(-3rem);
+    }
+
+    .character {
+      position: relative;
+      display: inline-block;
+      overflow: visible;
+      margin-top: 2rem;
+    }
+
+    .gear {
+      width: 240px;
+      height: 240px;
+      pointer-events: none;
+    }
+
+    .zzz {
+      position: absolute;
+      top: 0;
+      left: 42%;
+      pointer-events: none;
+      font-family: "PixelAE", sans-serif;
+      font-weight: 700;
+      font-size: 3rem;
+      color: var(--text);
+      opacity: 0;
+      animation: zzz-float 4s linear infinite;
+    }
+
+    .zzz-z2 { animation-delay: 0.7s; }
+    .zzz-z3 { animation-delay: 1.4s; }
+    .zzz-z1 { --drift: -34px; }
+    .zzz-z2 { --drift: -6px; }
+    .zzz-z3 { --drift: 24px; }
+
+    @keyframes zzz-float {
+      0%   { opacity: 0; transform: translate(calc(-50% + var(--drift) * 0.3), 0) scale(0.4); }
+      12%  { opacity: 1; }
+      20%  { transform: translate(calc(-50% + var(--drift) * 0.8), -38px) scale(0.7); }
+      35%  { transform: translate(calc(-50% + var(--drift) * 0.3), -68px) scale(0.95); }
+      50%  { transform: translate(calc(-50% + var(--drift) * 1.1), -98px) scale(1.15); }
+      65%  { transform: translate(calc(-50% + var(--drift) * 0.5), -128px) scale(1.32); }
+      80%  { transform: translate(calc(-50% + var(--drift) * 1.3), -138px) scale(1.42); }
+      100% { opacity: 0; transform: translate(calc(-50% + var(--drift) * 0.7), -150px) scale(1.5); }
+    }
+
+    .message {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: var(--text);
+    }
+
+    .sub-message {
+      font-size: 0.9rem;
+      color: var(--text);
+      margin-top: 0.75rem;
+      opacity: 0.9;
+    }
+
+    .socials {
+      display: flex;
+      gap: 1.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .social-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background-color: rgba(255, 255, 255, 0.06);
+      transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .social-link img {
+      width: 26px;
+      height: 26px;
+      display: block;
+      filter: brightness(0) invert(1);
+      transition: transform 0.2s ease;
+    }
+
+    .social-link:hover {
+      background-color: rgba(255, 255, 255, 0.16);
+      transform: translateY(-4px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+    }
+
+    .social-link:hover img {
+      transform: scale(1.1);
+    }
+
+    .social-link:active {
+      transform: translateY(-1px);
+    }
+
+    .social-link:focus-visible {
+      outline: 2px solid var(--text);
+      outline-offset: 3px;
+    }
+
+    @media (max-width: 480px) {
+      .gear {
+        width: 180px;
+        height: 180px;
+      }
+      .message {
+        font-size: 1.6rem;
+      }
+      .sub-message {
+        font-size: 0.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <img id="custom-cursor" src="assets/cursor/1. Pointer.png" alt="">
+  <div class="graphic-container">
+    <canvas id="topoCanvas"></canvas>
+  </div>
+  <div class="overlay"></div>
+
+  <main class="container">
+    <div class="character">
+      <img class="gear" src="assets/animation_faded.webp" alt="شخصيتي" draggable="false">
+      <span class="zzz zzz-z1">Z</span>
+      <span class="zzz zzz-z2">Z</span>
+      <span class="zzz zzz-z3">Z</span>
+    </div>
+
+    <div>
+      <h1 class="message">الموقع تحت الصيانة</h1>
+      <p class="sub-message">يمكنك مراسلتي أو رؤية أعمالي في المنصات التالية</p>
+    </div>
+
+    <nav class="socials" aria-label="روابط التواصل الاجتماعي">
+      <a class="social-link" href="https://x.com/lmpix" target="_blank" rel="noopener noreferrer" aria-label="X" title="X">
+        <img draggable="false" src="assets/icons/x.png" alt="X">
+      </a>
+      <a class="social-link" href="https://www.instagram.com/lmpix0/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" title="Instagram">
+        <img draggable="false" src="assets/icons/instagram.png" alt="Instagram">
+      </a>
+      <a class="social-link" href="https://www.reddit.com/user/lmpix0/" target="_blank" rel="noopener noreferrer" aria-label="Reddit" title="Reddit">
+        <img draggable="false" src="assets/icons/reddit.png" alt="Reddit">
+      </a>
+      <a class="social-link" href="https://discord.com/users/1294189381908693035" target="_blank" rel="noopener noreferrer" aria-label="Discord" title="Discord">
+        <img draggable="false" src="assets/icons/discord.png" alt="Discord">
+      </a>
+      <a class="social-link" href="https://www.artstation.com/lmpix" target="_blank" rel="noopener noreferrer" aria-label="ArtStation" title="ArtStation">
+        <img draggable="false" src="assets/icons/artstation.png" alt="ArtStation">
+      </a>
+    </nav>
+  </main>
+
+  <script>
+    // ===== الخلفية الطبوغرافية =====
+    (function () {
+      const canvas = document.getElementById('topoCanvas');
+      const ctx = canvas.getContext('2d');
+
+      let width, height;
+      let time = 0;
+      let mouse = { x: -1000, y: -1000, targetX: -1000, targetY: -1000 };
+
+      function resize() {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+      }
+      window.addEventListener('resize', resize);
+      resize();
+
+      window.addEventListener('mousemove', (e) => {
+        mouse.targetX = e.clientX;
+        mouse.targetY = e.clientY;
+      });
+      window.addEventListener('mouseleave', () => {
+        mouse.targetX = -1000;
+        mouse.targetY = -1000;
+      });
+
+      const p = new Uint8Array(512);
+      for (let i = 0; i < 256; i++) p[i] = p[i + 256] = Math.floor(Math.random() * 256);
+
+      function fade(t) { return t * t * t * (t * (t * 6 - 15) + 10); }
+      function lerp(t, a, b) { return a + t * (b - a); }
+      function grad(hash, x, y) {
+        const h = hash & 7;
+        const u = h < 4 ? x : y;
+        const v = h < 4 ? y : x;
+        return ((h & 1) === 0 ? u : -u) + ((h & 2) === 0 ? v : -v);
+      }
+
+      function noise(x, y) {
+        const X = Math.floor(x) & 255;
+        const Y = Math.floor(y) & 255;
+        x -= Math.floor(x);
+        y -= Math.floor(y);
+        const u = fade(x);
+        const v = fade(y);
+        const A = p[X] + Y, B = p[X + 1] + Y;
+        return lerp(v, lerp(u, grad(p[A], x, y), grad(p[B], x - 1, y)),
+                      lerp(u, grad(p[A + 1], x, y - 1), grad(p[B + 1], x - 1, y - 1)));
+      }
+
+      function draw() {
+        time += 0.003;
+        mouse.x += (mouse.targetX - mouse.x) * 0.05;
+        mouse.y += (mouse.targetY - mouse.y) * 0.05;
+
+        ctx.fillStyle = '#3b302f';
+        ctx.fillRect(0, 0, width, height);
+
+        const step = 12;
+        const cols = Math.ceil(width / step) + 1;
+        const rows = Math.ceil(height / step) + 1;
+        const grid = new Float32Array(cols * rows);
+
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            const x = c * step;
+            const y = r * step;
+            const dx = x - mouse.x;
+            const dy = y - mouse.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            let mouseEffect = 0;
+            if (dist < 250) {
+              mouseEffect = Math.cos((dist / 250) * Math.PI * 0.5) * 0.8;
+            }
+            grid[r * cols + c] = noise(x * 0.003 + time * 0.2, y * 0.003 + time * 0.2) * 1.5
+                               + noise(x * 0.008 + time * 0.15, y * 0.008 - time * 0.15) * 0.5
+                               + mouseEffect;
+          }
+        }
+
+        ctx.strokeStyle = '#cbbfb3';
+        ctx.lineWidth = 1.2;
+
+        for (let lev = 0; lev < 10; lev++) {
+          const threshold = (lev / 10) * 2 - 0.5;
+          ctx.beginPath();
+          ctx.globalAlpha = 0.25 + (lev / 10) * 0.5;
+
+          for (let r = 0; r < rows - 1; r++) {
+            for (let c = 0; c < cols - 1; c++) {
+              const x = c * step;
+              const y = r * step;
+              const v1 = grid[r * cols + c];
+              const v2 = grid[r * cols + (c + 1)];
+              const v3 = grid[(r + 1) * cols + (c + 1)];
+              const v4 = grid[(r + 1) * cols + c];
+
+              let cellIndex = 0;
+              if (v1 > threshold) cellIndex |= 1;
+              if (v2 > threshold) cellIndex |= 2;
+              if (v3 > threshold) cellIndex |= 4;
+              if (v4 > threshold) cellIndex |= 8;
+
+              if (cellIndex === 1 || cellIndex === 14) {
+                ctx.moveTo(x + step * 0.5, y);
+                ctx.lineTo(x, y + step * 0.5);
+              } else if (cellIndex === 2 || cellIndex === 13) {
+                ctx.moveTo(x + step, y + step * 0.5);
+                ctx.lineTo(x + step * 0.5, y);
+              } else if (cellIndex === 3 || cellIndex === 12) {
+                ctx.moveTo(x, y + step * 0.5);
+                ctx.lineTo(x + step, y + step * 0.5);
+              } else if (cellIndex === 4 || cellIndex === 11) {
+                ctx.moveTo(x + step * 0.5, y + step);
+                ctx.lineTo(x + step, y + step * 0.5);
+              } else if (cellIndex === 6 || cellIndex === 9) {
+                ctx.moveTo(x + step * 0.5, y);
+                ctx.lineTo(x + step * 0.5, y + step);
+              } else if (cellIndex === 8 || cellIndex === 7) {
+                ctx.moveTo(x, y + step * 0.5);
+                ctx.lineTo(x + step * 0.5, y + step);
+              }
+            }
+          }
+          ctx.stroke();
+        }
+
+        ctx.globalAlpha = 1.0;
+        requestAnimationFrame(draw);
+      }
+
+      draw();
+    })();
+
+    // ===== المؤشر المخصص =====
+    (function () {
+      const cursorEl = document.getElementById('custom-cursor');
+      const BASE = 'assets/cursor/';
+      const CURSORS = {
+        pointer: BASE + '1. Pointer.png',
+        hand: BASE + '2. Hand Pointer.png',
+        grab: BASE + '4. Hand Grab.png'
+      };
+
+      let targetX = -100, targetY = -100;
+      let curX = -100, curY = -100;
+      let currentShape = CURSORS.pointer;
+
+      function setCursor(shape) {
+        if (shape !== currentShape) {
+          currentShape = shape;
+          cursorEl.src = shape;
+        }
+      }
+
+      function updateCursor(target) {
+        if (target && (target.closest('.social-link') || target.closest('a'))) {
+          setCursor(CURSORS.hand);
+        } else {
+          setCursor(CURSORS.pointer);
+        }
+      }
+
+      window.addEventListener('mousemove', (e) => {
+        targetX = e.clientX;
+        targetY = e.clientY;
+        if (curX < 0) { curX = targetX; curY = targetY; }
+        updateCursor(e.target);
+      });
+
+      window.addEventListener('mousedown', (e) => {
+        cursorEl.classList.add('pressed');
+        if (e.target && (e.target.closest('.social-link') || e.target.closest('a'))) {
+          setCursor(CURSORS.grab);
+        }
+      });
+
+      window.addEventListener('mouseup', (e) => {
+        cursorEl.classList.remove('pressed');
+        updateCursor(e.target);
+      });
+
+      document.documentElement.addEventListener('mouseleave', () => { cursorEl.style.opacity = '0'; });
+      document.documentElement.addEventListener('mouseenter', () => { cursorEl.style.opacity = '1'; });
+
+      function loop() {
+        curX += (targetX - curX) * 0.25;
+        curY += (targetY - curY) * 0.25;
+        cursorEl.style.transform =
+          'translate(' + curX + 'px,' + curY + 'px)' +
+          (cursorEl.classList.contains('pressed') ? ' scale(0.8)' : '');
+        requestAnimationFrame(loop);
+      }
+      loop();
+    })();
+  </script>
+</body>
+</html>
